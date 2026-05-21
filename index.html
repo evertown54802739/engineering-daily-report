@@ -3,9 +3,772 @@
   <head>
     <meta charset="UTF-8" />
     <title>工程日報填報</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC",
+          Arial, sans-serif;
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        line-height: 1.6;
+        color: #111;
+        background: #fff;
+      }
+
+      h2,
+      h3 {
+        margin-bottom: 12px;
+      }
+
+      .section {
+        margin-bottom: 24px;
+        padding: 16px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      label {
+        display: block;
+        margin-top: 10px;
+        font-weight: bold;
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+        margin-top: 4px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 15px;
+      }
+
+      textarea {
+        resize: vertical;
+      }
+
+      button {
+        margin-top: 12px;
+        margin-right: 8px;
+        padding: 10px 16px;
+        font-size: 15px;
+        cursor: pointer;
+        border: none;
+        border-radius: 999px;
+        background: #e9e9e9;
+        color: #111;
+      }
+
+      button:hover {
+        background: #ddd;
+      }
+
+      .worker-row,
+      .expense-row {
+        position: relative;
+        margin-bottom: 12px;
+        padding: 12px;
+        border: 1px dashed #bbb;
+        border-radius: 6px;
+        background: #fff;
+      }
+
+      .inline-buttons {
+        margin-top: 10px;
+      }
+
+      #result {
+        margin-top: 20px;
+        font-weight: bold;
+        white-space: pre-line;
+      }
+
+      .loading {
+        color: #666;
+      }
+
+      .remove-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 28px;
+        height: 28px;
+        border: none;
+        border-radius: 50%;
+        background: #e0e0e0;
+        color: #333;
+        font-size: 16px;
+        line-height: 28px;
+        text-align: center;
+        cursor: pointer;
+        padding: 0;
+        margin: 0;
+      }
+
+      .remove-btn:hover {
+        background: #d0d0d0;
+      }
+
+      .submit-disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .debug-box {
+        margin-bottom: 16px;
+        padding: 10px;
+        border-radius: 6px;
+        background: #f5f5f5;
+        color: #555;
+        font-size: 13px;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          margin: 0;
+          padding: 16px;
+        }
+
+        .section {
+          padding: 14px;
+        }
+
+        button {
+          width: auto;
+          min-width: 88px;
+        }
+      }
+    </style>
   </head>
+
   <body>
-    <h1>工程日報填報</h1>
-    <p>GitHub Pages 測試成功</p>
+    <div class="debug-box">
+      GitHub Pages 版本：2026-05-20-GITHUB-001
+    </div>
+
+    <h2>工程日報填報</h2>
+
+    <div class="section">
+      <h3>基本資料</h3>
+
+      <label>填報人姓名</label>
+      <input type="text" id="reporterName" />
+
+      <label>日期</label>
+      <input type="date" id="workDate" />
+
+      <label>工程名稱</label>
+      <input type="text" id="projectName" />
+
+      <label>地點</label>
+      <input type="text" id="site" />
+
+      <label>結餘說明</label>
+      <input
+        type="text"
+        id="balanceText"
+        placeholder="例如：負14657+875=負15532"
+      />
+
+      <label>備註</label>
+      <textarea id="remark" rows="3"></textarea>
+    </div>
+
+    <div class="section">
+      <h3>人員名單</h3>
+      <div id="workersContainer"></div>
+
+      <div class="inline-buttons">
+        <button type="button" onclick="addWorkerRow()">新增人員</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>支出明細</h3>
+      <div id="expensesContainer"></div>
+
+      <div class="inline-buttons">
+        <button type="button" onclick="addExpenseRow()">新增支出</button>
+      </div>
+    </div>
+
+    <button type="button" id="submitBtn" onclick="submitForm()">送出</button>
+
+    <div id="result" class="loading">正在載入頁面...</div>
+
+    <script>
+      // ===== Apps Script API URL =====
+      // 請改成你的 Apps Script Web App 正式 /exec 網址
+      const APPS_SCRIPT_URL =
+        "https://script.google.com/macros/s/AKfycbykorbJ29zXiA3t9lCA4o5gn89DMRrckFuiiTduuO8XLbs4IyNKC5Xx6nWQPr40ruRi/exec";
+
+      // ===== LIFF 設定 =====
+      const LIFF_ID = "2010143172-JoeL4pE7";
+
+      // ===== 全域狀態 =====
+      let employeeNames = [];
+      let workerRowCount = 0;
+      let expenseRowCount = 0;
+      let isSubmitting = false;
+
+      // ===== LINE 使用者資訊 =====
+      let lineProfile = null;
+      let lineUserId = "";
+      let lineIdToken = "";
+
+      document.addEventListener("DOMContentLoaded", async function () {
+        const result = document.getElementById("result");
+
+        try {
+          setTodayIfEmpty();
+
+          result.innerText = "正在初始化 LIFF...";
+
+          await initLiffApp();
+
+          result.innerText = "正在讀取員工名單...";
+
+          loadEmployeeNames();
+        } catch (error) {
+          result.innerText =
+            "頁面初始化失敗：" +
+            (error && error.message ? error.message : String(error));
+          result.classList.remove("loading");
+        }
+      });
+
+      function setTodayIfEmpty() {
+        const workDateInput = document.getElementById("workDate");
+        if (!workDateInput || workDateInput.value) {
+          return;
+        }
+
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, "0");
+        const dd = String(today.getDate()).padStart(2, "0");
+
+        workDateInput.value = yyyy + "-" + mm + "-" + dd;
+      }
+
+      async function initLiffApp() {
+        if (typeof liff === "undefined") {
+          throw new Error("找不到 LIFF SDK，請確認網路連線或 SDK 載入狀態");
+        }
+
+        await liff.init({
+          liffId: LIFF_ID,
+          withLoginOnExternalBrowser: false,
+        });
+
+        // 電腦瀏覽器直接開 GitHub Pages 時，不強制登入，方便測試表單
+        if (!liff.isInClient()) {
+          lineProfile = null;
+          lineUserId = "";
+          lineIdToken = "";
+          return;
+        }
+
+        // 在 LINE App 內若尚未登入，才執行登入
+        if (!liff.isLoggedIn()) {
+          liff.login({
+            redirectUri: window.location.href,
+          });
+          return;
+        }
+
+        lineProfile = await liff.getProfile();
+        lineUserId = lineProfile.userId || "";
+        lineIdToken = liff.getIDToken() || "";
+
+        const reporterInput = document.getElementById("reporterName");
+        if (reporterInput && !reporterInput.value) {
+          reporterInput.value = lineProfile.displayName || "";
+        }
+      }
+
+      function validateApiUrl() {
+        if (
+          !APPS_SCRIPT_URL ||
+          APPS_SCRIPT_URL === "請貼上你的 Apps Script Web App /exec 網址"
+        ) {
+          throw new Error("尚未設定 APPS_SCRIPT_URL，請先貼上 Apps Script /exec 網址");
+        }
+      }
+
+      // 使用 JSONP 讀取員工名單，避免 GitHub Pages 跨網域 CORS 問題
+      function loadEmployeeNames() {
+        const result = document.getElementById("result");
+
+        try {
+          validateApiUrl();
+        } catch (error) {
+          result.innerText = error.message;
+          result.classList.remove("loading");
+          return;
+        }
+
+        result.innerText = "正在向 Apps Script 讀取員工名單...";
+
+        const callbackName =
+          "handleEmployees_" +
+          Date.now() +
+          "_" +
+          Math.random().toString(36).slice(2, 8);
+
+        const script = document.createElement("script");
+
+        window[callbackName] = function (response) {
+          try {
+            if (!response || !response.success) {
+              throw new Error(
+                response && response.message
+                  ? response.message
+                  : "讀取員工名單失敗",
+              );
+            }
+
+            employeeNames = Array.isArray(response.names) ? response.names : [];
+
+            document.getElementById("workersContainer").innerHTML = "";
+            document.getElementById("expensesContainer").innerHTML = "";
+            workerRowCount = 0;
+            expenseRowCount = 0;
+
+            addWorkerRow();
+            addExpenseRow();
+
+            result.innerText =
+              employeeNames.length > 0
+                ? "員工名單載入成功，共 " + employeeNames.length + " 人"
+                : "員工名單載入成功，但 Employees 表目前沒有資料";
+
+            result.classList.remove("loading");
+          } catch (error) {
+            result.innerText =
+              "載入員工名單失敗：" +
+              (error && error.message ? error.message : String(error));
+            result.classList.remove("loading");
+          } finally {
+            delete window[callbackName];
+            if (script.parentNode) {
+              script.parentNode.removeChild(script);
+            }
+          }
+        };
+
+        script.src =
+          APPS_SCRIPT_URL +
+          "?action=employees&callback=" +
+          encodeURIComponent(callbackName) +
+          "&t=" +
+          Date.now();
+
+        script.onerror = function () {
+          result.innerText = "載入員工名單失敗：無法連線到 Apps Script";
+          result.classList.remove("loading");
+          delete window[callbackName];
+
+          if (script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
+        };
+
+        document.body.appendChild(script);
+      }
+
+      function addWorkerRow() {
+        workerRowCount++;
+
+        const container = document.getElementById("workersContainer");
+        const div = document.createElement("div");
+        div.className = "worker-row";
+        div.setAttribute("data-worker-index", workerRowCount);
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.className = "remove-btn";
+        removeButton.textContent = "✕";
+        removeButton.title = "刪除此人員";
+        removeButton.onclick = function () {
+          removeWorkerRow(div);
+        };
+
+        const nameLabel = document.createElement("label");
+        nameLabel.textContent = "人員 " + workerRowCount;
+
+        const select = document.createElement("select");
+        select.id = "worker_name_" + workerRowCount;
+
+        const emptyOption = document.createElement("option");
+        emptyOption.value = "";
+        emptyOption.textContent = "請選擇人員";
+        select.appendChild(emptyOption);
+
+        employeeNames.forEach(function (name) {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name;
+          select.appendChild(option);
+        });
+
+        const hourLabel = document.createElement("label");
+        hourLabel.textContent = "工作時數";
+
+        const hourInput = document.createElement("input");
+        hourInput.type = "number";
+        hourInput.id = "worker_hours_" + workerRowCount;
+        hourInput.placeholder = "例如：8";
+        hourInput.min = "0";
+        hourInput.step = "0.5";
+
+        const noteLabel = document.createElement("label");
+        noteLabel.textContent = "人員備註";
+
+        const noteInput = document.createElement("input");
+        noteInput.type = "text";
+        noteInput.id = "worker_note_" + workerRowCount;
+        noteInput.placeholder = "例如：加班、半天、支援";
+
+        div.appendChild(removeButton);
+        div.appendChild(nameLabel);
+        div.appendChild(select);
+        div.appendChild(hourLabel);
+        div.appendChild(hourInput);
+        div.appendChild(noteLabel);
+        div.appendChild(noteInput);
+
+        container.appendChild(div);
+      }
+
+      function removeWorkerRow(rowElement) {
+        const container = document.getElementById("workersContainer");
+        const rows = container.querySelectorAll(".worker-row");
+
+        if (rows.length <= 1) {
+          document.getElementById("result").innerText =
+            "至少要保留 1 個人員輸入列";
+          return;
+        }
+
+        rowElement.remove();
+        document.getElementById("result").innerText = "";
+      }
+
+      function addExpenseRow() {
+        expenseRowCount++;
+
+        const container = document.getElementById("expensesContainer");
+        if (!container) {
+          throw new Error("找不到 expensesContainer");
+        }
+
+        const div = document.createElement("div");
+        div.className = "expense-row";
+        div.setAttribute("data-expense-index", expenseRowCount);
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.className = "remove-btn";
+        removeButton.textContent = "✕";
+        removeButton.title = "刪除此支出";
+        removeButton.onclick = function () {
+          removeExpenseRow(div);
+        };
+
+        const itemLabel = document.createElement("label");
+        itemLabel.textContent = "支出項目 " + expenseRowCount;
+
+        const itemInput = document.createElement("input");
+        itemInput.type = "text";
+        itemInput.id = "expenseItem_" + expenseRowCount;
+        itemInput.placeholder = "例如：電料";
+
+        const amountLabel = document.createElement("label");
+        amountLabel.textContent = "支出金額 " + expenseRowCount;
+
+        const amountInput = document.createElement("input");
+        amountInput.type = "number";
+        amountInput.id = "expenseAmount_" + expenseRowCount;
+        amountInput.placeholder = "例如：675";
+        amountInput.min = "0";
+
+        div.appendChild(removeButton);
+        div.appendChild(itemLabel);
+        div.appendChild(itemInput);
+        div.appendChild(amountLabel);
+        div.appendChild(amountInput);
+
+        container.appendChild(div);
+      }
+
+      function removeExpenseRow(rowElement) {
+        const container = document.getElementById("expensesContainer");
+        const rows = container.querySelectorAll(".expense-row");
+
+        if (rows.length <= 1) {
+          document.getElementById("result").innerText =
+            "至少要保留 1 個支出輸入列";
+          return;
+        }
+
+        rowElement.remove();
+        document.getElementById("result").innerText = "";
+      }
+
+      function getValue(id) {
+        const el = document.getElementById(id);
+        return el ? el.value : "";
+      }
+
+      function collectWorkers() {
+        const rows = document.querySelectorAll(".worker-row");
+        const workers = [];
+
+        rows.forEach(function (row) {
+          const index = row.getAttribute("data-worker-index");
+          workers.push({
+            name: getValue("worker_name_" + index),
+            hours: getValue("worker_hours_" + index),
+            note: getValue("worker_note_" + index),
+          });
+        });
+
+        return workers;
+      }
+
+      function collectExpenses() {
+        const rows = document.querySelectorAll(".expense-row");
+        const expenses = [];
+
+        rows.forEach(function (row) {
+          const index = row.getAttribute("data-expense-index");
+          expenses.push({
+            item: getValue("expenseItem_" + index),
+            amount: getValue("expenseAmount_" + index),
+          });
+        });
+
+        return expenses;
+      }
+
+      function getValidWorkers(workers) {
+        return workers.filter(function (worker) {
+          return String(worker.name || "").trim() !== "";
+        });
+      }
+
+      function validateProjectName(projectName) {
+        if (!projectName || String(projectName).trim() === "") {
+          return "工程名稱不可空白";
+        }
+        return "";
+      }
+
+      function validateWorkDate(workDate) {
+        if (!workDate || String(workDate).trim() === "") {
+          return "工作日期不可空白";
+        }
+        return "";
+      }
+
+      function validateWorkers(workers) {
+        const usedNames = new Set();
+
+        for (let i = 0; i < workers.length; i++) {
+          const worker = workers[i];
+          const rowNo = i + 1;
+
+          if (!worker.name) {
+            continue;
+          }
+
+          if (
+            worker.hours === "" ||
+            worker.hours === null ||
+            worker.hours === undefined
+          ) {
+            return "人員第 " + rowNo + " 筆已選姓名，但未填工作時數";
+          }
+
+          const hoursNumber = Number(worker.hours);
+          if (isNaN(hoursNumber) || hoursNumber <= 0) {
+            return "人員「" + worker.name + "」的工作時數必須大於 0";
+          }
+
+          if (usedNames.has(worker.name)) {
+            return "人員「" + worker.name + "」不可重複選擇";
+          }
+
+          usedNames.add(worker.name);
+        }
+
+        if (getValidWorkers(workers).length === 0) {
+          return "至少需要 1 位有效人員";
+        }
+
+        return "";
+      }
+
+      function validateExpenses(expenses) {
+        for (let i = 0; i < expenses.length; i++) {
+          const expense = expenses[i];
+          const rowNo = i + 1;
+
+          const item = String(expense.item || "").trim();
+          const amountRaw = expense.amount;
+
+          const hasItem = item !== "";
+          const hasAmount =
+            amountRaw !== "" && amountRaw !== null && amountRaw !== undefined;
+
+          if (hasItem && !hasAmount) {
+            return "支出第 " + rowNo + " 筆已填項目，但未填金額";
+          }
+
+          if (!hasItem && hasAmount) {
+            return "支出第 " + rowNo + " 筆已填金額，但未填項目";
+          }
+
+          if (!hasItem && !hasAmount) {
+            continue;
+          }
+
+          const amountNumber = Number(amountRaw);
+
+          if (isNaN(amountNumber)) {
+            return "支出第 " + rowNo + " 筆金額格式錯誤";
+          }
+
+          if (amountNumber < 0) {
+            return "支出第 " + rowNo + " 筆金額不可小於 0";
+          }
+        }
+
+        return "";
+      }
+
+      function generateSubmissionToken() {
+        return (
+          "SUB_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10)
+        );
+      }
+
+      function setSubmittingState(submitting) {
+        isSubmitting = submitting;
+        const submitBtn = document.getElementById("submitBtn");
+
+        if (submitting) {
+          submitBtn.disabled = true;
+          submitBtn.classList.add("submit-disabled");
+          submitBtn.textContent = "送出中...";
+        } else {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove("submit-disabled");
+          submitBtn.textContent = "送出";
+        }
+      }
+
+      function submitForm() {
+        const result = document.getElementById("result");
+
+        if (isSubmitting) {
+          result.innerText = "資料送出中，請勿重複點擊";
+          return;
+        }
+
+        try {
+          validateApiUrl();
+        } catch (error) {
+          result.innerText = error.message;
+          return;
+        }
+
+        const workers = collectWorkers();
+        const expenses = collectExpenses();
+        const projectName = getValue("projectName");
+        const workDate = getValue("workDate");
+
+        const dateError = validateWorkDate(workDate);
+        if (dateError) {
+          result.innerText = dateError;
+          return;
+        }
+
+        const projectError = validateProjectName(projectName);
+        if (projectError) {
+          result.innerText = projectError;
+          return;
+        }
+
+        const workerError = validateWorkers(workers);
+        if (workerError) {
+          result.innerText = workerError;
+          return;
+        }
+
+        const expenseError = validateExpenses(expenses);
+        if (expenseError) {
+          result.innerText = expenseError;
+          return;
+        }
+
+        const data = {
+          submissionToken: generateSubmissionToken(),
+          reporterName: getValue("reporterName"),
+          reporterLineUserId: lineUserId,
+          reporterIdToken: lineIdToken,
+          workDate: workDate,
+          projectName: projectName,
+          site: getValue("site"),
+          balanceText: getValue("balanceText"),
+          remark: getValue("remark"),
+          workers: workers,
+          expenses: expenses,
+        };
+
+        setSubmittingState(true);
+        result.innerText = "正在送出資料...";
+
+        fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+          },
+          body: JSON.stringify(data),
+        })
+          .then(function () {
+            result.innerText =
+              "已送出資料。\n請到 Google Sheet 檢查是否新增資料。";
+
+            setSubmittingState(false);
+
+            if (
+              typeof liff !== "undefined" &&
+              liff.isInClient &&
+              liff.isInClient()
+            ) {
+              setTimeout(function () {
+                liff.closeWindow();
+              }, 1200);
+            }
+          })
+          .catch(function (error) {
+            result.innerText =
+              "送出失敗：" +
+              (error && error.message ? error.message : String(error));
+            setSubmittingState(false);
+          });
+      }
+    </script>
   </body>
 </html>
