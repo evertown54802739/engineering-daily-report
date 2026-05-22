@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <title>工程日報填報</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
     <style>
@@ -18,6 +21,7 @@
         --danger-soft: #fee4e2;
         --success: #027a48;
         --success-soft: #ecfdf3;
+        --line: #dbe4ef;
         --shadow: 0 8px 24px rgba(23, 32, 51, 0.08);
         --radius-lg: 18px;
         --radius-md: 12px;
@@ -35,14 +39,17 @@
       body {
         margin: 0;
         color: var(--text);
-        background: linear-gradient(180deg, #eaf1f9 0%, #f4f7fb 280px), var(--bg);
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", Arial, sans-serif;
+        background:
+          linear-gradient(180deg, #eaf1f9 0%, #f4f7fb 280px), var(--bg);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC",
+          "PingFang TC", "Microsoft JhengHei", Arial, sans-serif;
         line-height: 1.6;
       }
 
       .app-shell {
         width: 100%;
-        max-width: 860px;
+        max-width: 900px;
         margin: 0 auto;
         padding: 20px 16px max(40px, env(safe-area-inset-bottom));
         padding-left: max(16px, env(safe-area-inset-left));
@@ -54,13 +61,17 @@
         padding: 22px 18px;
         border-radius: 24px;
         color: #fff;
-        background: linear-gradient(135deg, #173b5c 0%, #1f4e79 55%, #2f6f9f 100%);
+        background: linear-gradient(
+          135deg,
+          #173b5c 0%,
+          #1f4e79 55%,
+          #2f6f9f 100%
+        );
         box-shadow: var(--shadow);
       }
 
       .app-kicker {
         display: inline-flex;
-        align-items: center;
         margin-bottom: 8px;
         padding: 4px 10px;
         border-radius: 999px;
@@ -83,7 +94,8 @@
         font-size: 14px;
       }
 
-      .section {
+      .section,
+      .work-block {
         margin-bottom: 18px;
         padding: 18px;
         border: 1px solid rgba(217, 225, 236, 0.95);
@@ -92,35 +104,40 @@
         box-shadow: var(--shadow);
       }
 
-      .section-header {
+      .section-header,
+      .work-block-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
         margin-bottom: 16px;
       }
 
-      .section-title {
+      .section-title,
+      .work-block-title {
         margin: 0;
         font-size: 19px;
         font-weight: 800;
         letter-spacing: 0.02em;
       }
 
-      .section-desc {
+      .section-desc,
+      .work-block-desc {
         margin: 2px 0 0;
         color: var(--muted);
         font-size: 13px;
       }
 
-      .field-grid,
-      .row-grid {
+      .field-grid {
         display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: 14px;
       }
 
-      .field-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .row-grid {
-        grid-template-columns: 1.3fr 0.7fr;
+      .block-title-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
       }
 
       .field,
@@ -155,7 +172,9 @@
         color: var(--text);
         font-size: 16px;
         line-height: 1.4;
-        transition: border-color 0.16s ease, box-shadow 0.16s ease;
+        transition:
+          border-color 0.16s ease,
+          box-shadow 0.16s ease;
       }
 
       textarea {
@@ -165,9 +184,15 @@
 
       select {
         padding-right: 38px;
-        background-image: linear-gradient(45deg, transparent 50%, #6b7280 50%), linear-gradient(135deg, #6b7280 50%, transparent 50%);
-        background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
-        background-size: 6px 6px, 6px 6px;
+        background-image:
+          linear-gradient(45deg, transparent 50%, #6b7280 50%),
+          linear-gradient(135deg, #6b7280 50%, transparent 50%);
+        background-position:
+          calc(100% - 18px) 50%,
+          calc(100% - 12px) 50%;
+        background-size:
+          6px 6px,
+          6px 6px;
         background-repeat: no-repeat;
       }
 
@@ -192,7 +217,10 @@
         font-weight: 700;
         cursor: pointer;
         touch-action: manipulation;
-        transition: transform 0.12s ease, background 0.12s ease, opacity 0.12s ease;
+        transition:
+          transform 0.12s ease,
+          background 0.12s ease,
+          opacity 0.12s ease;
       }
 
       button:active {
@@ -220,54 +248,64 @@
         background: #d9e9f7;
       }
 
+      .btn-danger-soft {
+        color: var(--danger);
+        background: var(--danger-soft);
+      }
+
       .submit-disabled {
         opacity: 0.65;
         cursor: not-allowed;
       }
 
+      .work-blocks,
       .dynamic-list {
         display: flex;
         flex-direction: column;
         gap: 12px;
       }
 
-      .entry-card {
-        padding: 14px;
-        border: 1px solid #dbe4ef;
-        border-radius: 16px;
+      .workers-list {
+        margin-top: 14px;
+      }
+
+      .worker-row,
+      .expense-row {
+        display: grid;
+        gap: 8px;
+        align-items: end;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
         background: #fbfdff;
       }
 
-      .entry-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 12px;
+      .worker-row {
+        grid-template-columns: 1.25fr 0.55fr 1fr 38px;
       }
 
-      .entry-title {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin: 0;
-        color: #1f2937;
+      .expense-row {
+        grid-template-columns: 1.4fr 0.7fr 38px;
+      }
+
+      .worker-row .field,
+      .expense-row .field {
+        gap: 4px;
+      }
+
+      .worker-row label,
+      .expense-row label {
+        font-size: 12px;
+      }
+
+      .worker-row input,
+      .worker-row select,
+      .expense-row input,
+      .expense-row select {
+        min-height: 40px;
+        padding: 8px 10px;
+        border-radius: 10px;
         font-size: 15px;
-        font-weight: 800;
-      }
-
-      .entry-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 28px;
-        height: 28px;
-        padding: 0 9px;
-        border-radius: 999px;
-        color: #fff;
-        background: var(--primary);
-        font-size: 13px;
-        font-weight: 800;
       }
 
       .remove-btn {
@@ -290,14 +328,24 @@
 
       .action-row {
         display: flex;
+        flex-wrap: wrap;
         gap: 10px;
         margin-top: 14px;
+      }
+
+      .block-action-row {
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .remove-block-btn {
+        margin-left: auto;
       }
 
       .result-box {
         margin-top: 16px;
         padding: 14px 16px;
-        border: 1px solid #dbe4ef;
+        border: 1px solid var(--line);
         border-radius: 14px;
         background: #fff;
         color: #334155;
@@ -337,13 +385,22 @@
           font-size: 24px;
         }
 
-        .section {
+        .section,
+        .work-block {
           padding: 16px;
           border-radius: 18px;
         }
 
+        .section-header,
+        .work-block-header {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
         .field-grid,
-        .row-grid {
+        .block-title-grid,
+        .worker-row,
+        .expense-row {
           grid-template-columns: 1fr;
         }
 
@@ -355,7 +412,8 @@
           flex-direction: column;
         }
 
-        .btn-secondary {
+        .btn-secondary,
+        .btn-danger-soft {
           width: 100%;
         }
       }
@@ -365,21 +423,19 @@
   <body>
     <main class="app-shell">
       <header class="app-header">
-        <div class="app-kicker">工程日報系統</div>
         <h1 class="app-title">工程日報填報</h1>
-        <p class="app-subtitle">填寫每日施工人員、地點、支出與備註資訊</p>
+        <p class="app-subtitle">填寫每日施工進度、人員、材料支出、當日結餘</p>
       </header>
 
       <section class="section">
-        <div class="section-header">
-          <h2 class="section-title">基本資料</h2>
-          <p class="section-desc">請確認日期、工程名稱與填報人資料</p>
-        </div>
-
         <div class="field-grid">
           <div class="field">
-            <label for="reporterName">填報人姓名</label>
-            <input id="reporterName" type="text" placeholder="系統可自動帶入 LINE 名稱" />
+            <label for="reporterName">填報人</label>
+            <input
+              id="reporterName"
+              type="text"
+              placeholder="系統自動帶入 LINE 名稱"
+            />
           </div>
 
           <div class="field">
@@ -388,66 +444,69 @@
           </div>
 
           <div class="field-full">
-            <label for="projectName">工程名稱</label>
-            <input id="projectName" type="text" placeholder="請輸入工程名稱" />
-          </div>
-
-          <div class="field-full">
-            <label for="site">地點</label>
-            <input id="site" type="text" placeholder="請輸入施工地點" />
-          </div>
-
-          <div class="field-full">
-            <label for="balanceText">結餘說明</label>
-            <input id="balanceText" type="text" placeholder="例如：負14657+875=負15532" />
+            <label for="balanceText">當日結餘</label>
+            <input
+              id="balanceText"
+              type="text"
+              placeholder="例如：負12000+4000=負8000"
+            />
           </div>
 
           <div class="field-full">
             <label for="remark">備註</label>
-            <textarea id="remark" rows="3" placeholder="可填寫當日施工狀況、特殊事項或補充說明"></textarea>
+            <textarea
+              id="remark"
+              rows="3"
+              placeholder="可填寫當日施工狀況、特殊事項或補充說明"
+            ></textarea>
           </div>
         </div>
       </section>
 
       <section class="section">
-        <div class="section-header">
-          <h2 class="section-title">人員名單</h2>
-          <p class="section-desc">可新增多位施工人員，工時必填</p>
-        </div>
-
-        <div id="workersContainer" class="dynamic-list"></div>
+        <div id="workBlocksContainer" class="work-blocks"></div>
 
         <div class="action-row">
-          <button id="addWorkerBtn" type="button" class="btn-secondary">＋ 新增人員</button>
+          <button id="addWorkBlockBtn" type="button" class="btn-secondary">
+            ＋ 新增區塊
+          </button>
         </div>
       </section>
 
       <section class="section">
         <div class="section-header">
-          <h2 class="section-title">購買材料 / 支出明細</h2>
-          <p class="section-desc">請填寫購買項目與金額，項目與金額需成對填寫</p>
+          <div>
+            <h2 class="section-title">購買材料 / 支出明細</h2>
+            <p class="section-desc">沒有支出可不用新增</p>
+          </div>
         </div>
 
         <div id="expensesContainer" class="dynamic-list"></div>
 
         <div class="action-row">
-          <button id="addExpenseBtn" type="button" class="btn-secondary">＋ 新增材料 / 支出</button>
+          <button id="addExpenseBtn" type="button" class="btn-secondary">
+            ＋ 新增材料 / 支出
+          </button>
         </div>
       </section>
 
-      <button id="submitBtn" type="button" class="btn-primary">送出工程日報</button>
+      <button id="submitBtn" type="button" class="btn-primary">
+        送出工程日報
+      </button>
       <div id="result" class="result-box is-loading">正在載入頁面...</div>
     </main>
 
     <script>
       const CONFIG = {
-        appsScriptUrl: "https://script.google.com/macros/s/AKfycbxEGuG2AG0_Uw34614qtVqmToYuArF6GcdorMVLKNr6r1eerfIsY1oY41J7-e6qbWun/exec",
+        appsScriptUrl:
+          "https://script.google.com/macros/s/AKfycbxEGuG2AG0_Uw34614qtVqmToYuArF6GcdorMVLKNr6r1eerfIsY1oY41J7-e6qbWun/exec",
         liffId: "2010143172-JoeL4pE7",
+        defaultWorkerRowsPerBlock: 5,
       };
 
       const state = {
         employeeNames: [],
-        workerSeq: 0,
+        blockSeq: 0,
         expenseSeq: 0,
         isSubmitting: false,
         lineProfile: null,
@@ -462,7 +521,6 @@
       async function initializeApp() {
         cacheDom();
         bindEvents();
-        setTodayIfEmpty();
 
         try {
           setResult("正在初始化 LIFF...", "loading");
@@ -479,13 +537,11 @@
         [
           "reporterName",
           "workDate",
-          "projectName",
-          "site",
           "balanceText",
           "remark",
-          "workersContainer",
+          "workBlocksContainer",
           "expensesContainer",
-          "addWorkerBtn",
+          "addWorkBlockBtn",
           "addExpenseBtn",
           "submitBtn",
           "result",
@@ -495,7 +551,7 @@
       }
 
       function bindEvents() {
-        dom.addWorkerBtn.addEventListener("click", addWorkerRow);
+        dom.addWorkBlockBtn.addEventListener("click", () => addWorkBlock());
         dom.addExpenseBtn.addEventListener("click", addExpenseRow);
         dom.submitBtn.addEventListener("click", submitForm);
       }
@@ -560,7 +616,7 @@
           return;
         }
 
-        setResult("正在向 Apps Script 讀取員工名單...", "loading");
+        setResult("正在讀取員工名單...", "loading");
 
         const callbackName = `handleEmployees_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
         const script = document.createElement("script");
@@ -571,8 +627,10 @@
               throw new Error(response?.message || "讀取員工名單失敗");
             }
 
-            state.employeeNames = Array.isArray(response.names) ? response.names : [];
-            resetDynamicRows();
+            state.employeeNames = Array.isArray(response.names)
+              ? response.names
+              : [];
+            resetFormRows();
 
             setResult(
               state.employeeNames.length > 0
@@ -601,129 +659,272 @@
         script.parentNode?.removeChild(script);
       }
 
-      function resetDynamicRows() {
-        dom.workersContainer.innerHTML = "";
+      function resetFormRows() {
+        dom.workBlocksContainer.innerHTML = "";
         dom.expensesContainer.innerHTML = "";
-        state.workerSeq = 0;
+        state.blockSeq = 0;
         state.expenseSeq = 0;
-
-        addWorkerRow();
-        addExpenseRow();
+        addWorkBlock();
       }
 
-      function addWorkerRow() {
-        state.workerSeq += 1;
+      function addWorkBlock() {
+        state.blockSeq += 1;
 
-        const index = state.workerSeq;
-        const card = createEntryCard("worker", index, "人員資料");
-        const grid = createElement("div", { className: "row-grid" });
+        const block = createElement("article", {
+          className: "work-block",
+          dataset: { blockIndex: state.blockSeq },
+        });
+
+        block.append(
+          createWorkBlockTitleFields(state.blockSeq),
+          createWorkersList(),
+          createWorkBlockActions(block),
+        );
+
+        dom.workBlocksContainer.appendChild(block);
+
+        for (let i = 0; i < CONFIG.defaultWorkerRowsPerBlock; i += 1) {
+          addWorkerRow(block);
+        }
+
+        renumberWorkBlocks();
+      }
+
+      function createWorkBlockTitleFields(index) {
+        const grid = createElement("div", { className: "block-title-grid" });
 
         grid.append(
           createField({
-            label: "人員姓名",
-            control: createWorkerSelect(index),
+            label: "工程內容",
+            control: createInput({
+              type: "text",
+              className: "block-project",
+            }),
+          }),
+        );
+
+        return grid;
+      }
+
+      function createWorkersList() {
+        return createElement("div", { className: "dynamic-list workers-list" });
+      }
+
+      function createWorkBlockActions(block) {
+        const actionRow = createElement("div", {
+          className: "action-row block-action-row",
+        });
+        const addWorkerButton = createElement("button", {
+          className: "btn-secondary",
+          type: "button",
+          textContent: "＋ 新增人員",
+        });
+        const removeBlockButton = createElement("button", {
+          className: "btn-danger-soft remove-block-btn",
+          type: "button",
+          textContent: "刪除此區塊",
+        });
+
+        addWorkerButton.addEventListener("click", () => addWorkerRow(block));
+        removeBlockButton.addEventListener("click", () =>
+          removeWorkBlock(block),
+        );
+
+        actionRow.append(addWorkerButton, removeBlockButton);
+        return actionRow;
+      }
+
+      function removeWorkBlock(block) {
+        if (
+          dom.workBlocksContainer.querySelectorAll(".work-block").length <= 1
+        ) {
+          setResult("至少要保留 1 個施工區塊", "error");
+          return;
+        }
+
+        block.remove();
+        renumberWorkBlocks();
+        clearResult();
+      }
+
+      function addWorkerRow(block) {
+        const workersList = block.querySelector(".workers-list");
+        const row = createElement("div", {
+          className: "worker-row",
+          dataset: {
+            workerIndex: workersList.querySelectorAll(".worker-row").length + 1,
+          },
+        });
+        const removeButton = createElement("button", {
+          className: "remove-btn",
+          type: "button",
+          textContent: "×",
+          title: "刪除此人員",
+        });
+
+        removeButton.addEventListener("click", () =>
+          removeWorkerRow(block, row),
+        );
+
+        row.append(
+          createField({
+            label: "人員",
+            control: createWorkerSelect(),
           }),
           createField({
-            label: "工作時數",
+            label: "時數",
             control: createInput({
-              id: `worker_hours_${index}`,
               type: "number",
-              placeholder: "例如：8",
+              className: "worker-hours",
+              value: "8",
               min: "0",
               step: "0.5",
               inputMode: "decimal",
             }),
           }),
           createField({
-            label: "人員備註",
-            className: "field-full",
+            label: "備註",
             control: createInput({
-              id: `worker_note_${index}`,
               type: "text",
-              placeholder: "例如：加班、半天、支援",
+              className: "worker-note",
             }),
           }),
+          removeButton,
         );
 
-        card.appendChild(grid);
-        dom.workersContainer.appendChild(card);
+        workersList.appendChild(row);
+        renumberWorkers(block);
+      }
+
+      function removeWorkerRow(block, row) {
+        const workersList = block.querySelector(".workers-list");
+
+        if (workersList.querySelectorAll(".worker-row").length <= 1) {
+          setResult("每個施工區塊至少要保留 1 個人員輸入列", "error");
+          return;
+        }
+
+        row.remove();
+        renumberWorkers(block);
+        clearResult();
+      }
+
+      function renumberWorkBlocks() {
+        const blocks = Array.from(
+          dom.workBlocksContainer.querySelectorAll(".work-block"),
+        );
+
+        blocks.forEach((block, blockZeroIndex) => {
+          const blockIndex = blockZeroIndex + 1;
+          block.dataset.blockIndex = String(blockIndex);
+          renumberWorkers(block);
+        });
+
+        state.blockSeq = blocks.length;
+      }
+
+      function renumberWorkers(block) {
+        const blockIndex = block.dataset.blockIndex;
+        const rows = Array.from(block.querySelectorAll(".worker-row"));
+
+        rows.forEach((row, workerZeroIndex) => {
+          const workerIndex = workerZeroIndex + 1;
+          row.dataset.workerIndex = String(workerIndex);
+          const label = row.querySelector("label");
+          if (label) label.textContent = `人員 ${workerIndex}`;
+
+          const select = row.querySelector("select");
+          const hours = row.querySelector(".worker-hours");
+          const note = row.querySelector(".worker-note");
+
+          if (select)
+            select.id = `block_${blockIndex}_worker_${workerIndex}_name`;
+          if (hours)
+            hours.id = `block_${blockIndex}_worker_${workerIndex}_hours`;
+          if (note) note.id = `block_${blockIndex}_worker_${workerIndex}_note`;
+        });
       }
 
       function addExpenseRow() {
         state.expenseSeq += 1;
 
         const index = state.expenseSeq;
-        const card = createEntryCard("expense", index, "材料 / 支出");
-        const grid = createElement("div", { className: "row-grid" });
-
-        grid.append(
-          createField({
-            label: "購買項目",
-            control: createInput({
-              id: `expenseItem_${index}`,
-              type: "text",
-              placeholder: "例如：電料、水泥、五金",
-            }),
-          }),
-          createField({
-            label: "金額",
-            control: createInput({
-              id: `expenseAmount_${index}`,
-              type: "number",
-              placeholder: "例如：675",
-              min: "0",
-              inputMode: "numeric",
-            }),
-          }),
-        );
-
-        card.appendChild(grid);
-        dom.expensesContainer.appendChild(card);
-      }
-
-      function createEntryCard(type, index, titleText) {
-        const card = createElement("div", {
-          className: `entry-card ${type}-row`,
-          dataset: { index },
-        });
-        const header = createElement("div", { className: "entry-header" });
-        const title = createElement("h3", { className: "entry-title" });
-        const badge = createElement("span", {
-          className: "entry-badge",
-          textContent: String(index),
+        const row = createElement("div", {
+          className: "expense-row",
+          dataset: { expenseIndex: index },
         });
         const removeButton = createElement("button", {
           className: "remove-btn",
           type: "button",
           textContent: "×",
-          title: type === "worker" ? "刪除此人員" : "刪除此材料 / 支出",
+          title: "刪除此材料 / 支出",
         });
 
-        removeButton.addEventListener("click", () => removeEntryRow(type, card));
+        removeButton.addEventListener("click", () => removeExpenseRow(row));
 
-        title.append(badge, document.createTextNode(titleText));
-        header.append(title, removeButton);
-        card.appendChild(header);
+        row.append(
+          createField({
+            label: `項目 ${index}`,
+            control: createInput({
+              type: "text",
+              className: "expense-item",
+              placeholder: "電料、水泥、五金",
+            }),
+          }),
+          createField({
+            label: "金額",
+            control: createInput({
+              type: "number",
+              className: "expense-amount",
+              placeholder: "675",
+              min: "0",
+              inputMode: "numeric",
+            }),
+          }),
+          removeButton,
+        );
 
-        return card;
+        dom.expensesContainer.appendChild(row);
+        renumberExpenses();
       }
 
-      function createWorkerSelect(index) {
-        const select = createElement("select", { id: `worker_name_${index}` });
+      function removeExpenseRow(row) {
+        row.remove();
+        renumberExpenses();
+        clearResult();
+      }
+
+      function renumberExpenses() {
+        const rows = Array.from(
+          dom.expensesContainer.querySelectorAll(".expense-row"),
+        );
+
+        rows.forEach((row, zeroBasedIndex) => {
+          const index = zeroBasedIndex + 1;
+          row.dataset.expenseIndex = String(index);
+
+          const label = row.querySelector("label");
+          const item = row.querySelector(".expense-item");
+          const amount = row.querySelector(".expense-amount");
+
+          if (label) label.textContent = `項目 ${index}`;
+          if (item) item.id = `expense_${index}_item`;
+          if (amount) amount.id = `expense_${index}_amount`;
+        });
+
+        state.expenseSeq = rows.length;
+      }
+
+      function createWorkerSelect() {
+        const select = createElement("select", { className: "worker-name" });
 
         select.appendChild(
-          createElement("option", {
-            value: "",
-            textContent: "請選擇人員",
-          }),
+          createElement("option", { value: "", textContent: "請選擇人員" }),
         );
 
         state.employeeNames.forEach((name) => {
           select.appendChild(
-            createElement("option", {
-              value: name,
-              textContent: name,
-            }),
+            createElement("option", { value: name, textContent: name }),
           );
         });
 
@@ -733,10 +934,6 @@
       function createField({ label, control, className = "field" }) {
         const wrapper = createElement("div", { className });
         const labelElement = createElement("label", { textContent: label });
-
-        if (control.id) {
-          labelElement.htmlFor = control.id;
-        }
 
         wrapper.append(labelElement, control);
         return wrapper;
@@ -767,21 +964,6 @@
         return element;
       }
 
-      function removeEntryRow(type, rowElement) {
-        const isWorker = type === "worker";
-        const selector = isWorker ? ".worker-row" : ".expense-row";
-        const container = isWorker ? dom.workersContainer : dom.expensesContainer;
-        const minMessage = isWorker ? "至少要保留 1 個人員輸入列" : "至少要保留 1 個支出輸入列";
-
-        if (container.querySelectorAll(selector).length <= 1) {
-          setResult(minMessage, "error");
-          return;
-        }
-
-        rowElement.remove();
-        clearResult();
-      }
-
       function submitForm() {
         if (state.isSubmitting) {
           setResult("資料送出中，請勿重複點擊", "loading");
@@ -806,36 +988,104 @@
       }
 
       function buildReportPayload() {
+        const workSections = collectWorkSections();
+        const activeSections = getActiveWorkSections(workSections);
+        const flattenedWorkers = flattenWorkers(activeSections);
+        const projectName = buildProjectNameText(activeSections);
+
         return {
           submissionToken: generateSubmissionToken(),
           reporterName: getValue("reporterName"),
           reporterLineUserId: state.lineUserId,
           reporterIdToken: state.lineIdToken,
           workDate: getValue("workDate"),
-          projectName: getValue("projectName"),
-          site: getValue("site"),
+          projectName,
           balanceText: getValue("balanceText"),
           remark: getValue("remark"),
-          workers: collectRows(".worker-row", (index) => ({
-            name: getValue(`worker_name_${index}`),
-            hours: getValue(`worker_hours_${index}`),
-            note: getValue(`worker_note_${index}`),
-          })),
-          expenses: collectRows(".expense-row", (index) => ({
-            item: getValue(`expenseItem_${index}`),
-            amount: getValue(`expenseAmount_${index}`),
-          })),
+          workers: flattenedWorkers,
+          expenses: collectExpenses(),
+          workSections: activeSections,
         };
       }
 
-      function collectRows(selector, mapRow) {
-        return Array.from(document.querySelectorAll(selector)).map((row) => mapRow(row.dataset.index));
+      function collectWorkSections() {
+        return Array.from(
+          dom.workBlocksContainer.querySelectorAll(".work-block"),
+        ).map((block) => {
+          const projectName =
+            block.querySelector(".block-project")?.value || "";
+          const workers = Array.from(block.querySelectorAll(".worker-row")).map(
+            (row) => ({
+              name: row.querySelector(".worker-name")?.value || "",
+              hours: row.querySelector(".worker-hours")?.value || "",
+              note: row.querySelector(".worker-note")?.value || "",
+            }),
+          );
+
+          return {
+            projectName: projectName.trim(),
+            workers,
+          };
+        });
+      }
+
+      function getActiveWorkSections(workSections) {
+        return workSections.filter((section) => {
+          const hasProject = Boolean(String(section.projectName || "").trim());
+          const hasWorker = section.workers.some((worker) =>
+            String(worker.name || "").trim(),
+          );
+
+          return hasProject || hasWorker;
+        });
+      }
+
+      function flattenWorkers(workSections) {
+        return workSections.flatMap((section) => {
+          const sectionLabel = String(section.projectName || "").trim();
+
+          return section.workers
+            .filter((worker) => String(worker.name || "").trim())
+            .map((worker) => {
+              const rawNote = String(worker.note || "").trim();
+              const note = [
+                sectionLabel ? `區塊：${sectionLabel}` : "",
+                rawNote,
+              ]
+                .filter(Boolean)
+                .join("；");
+
+              return {
+                name: worker.name,
+                hours: worker.hours,
+                note,
+              };
+            });
+        });
+      }
+
+      function buildProjectNameText(workSections) {
+        return workSections
+          .map(
+            (section, index) =>
+              `${index + 1}. ${section.projectName || "未填工程內容"}`,
+          )
+          .join("；");
+      }
+
+      function collectExpenses() {
+        return Array.from(
+          dom.expensesContainer.querySelectorAll(".expense-row"),
+        ).map((row) => ({
+          item: row.querySelector(".expense-item")?.value || "",
+          amount: row.querySelector(".expense-amount")?.value || "",
+        }));
       }
 
       function validateReportPayload(data) {
         return (
           validateWorkDate(data.workDate) ||
-          validateProjectName(data.projectName) ||
+          validateWorkSections(data.workSections) ||
           validateWorkers(data.workers) ||
           validateExpenses(data.expenses)
         );
@@ -845,39 +1095,44 @@
         return workDate ? "" : "工作日期不可空白";
       }
 
-      function validateProjectName(projectName) {
-        return String(projectName || "").trim() ? "" : "工程名稱不可空白";
-      }
+      function validateWorkSections(workSections) {
+        const activeSections = getActiveWorkSections(workSections);
 
-      function validateWorkers(workers) {
-        const usedNames = new Set();
-        const validWorkers = workers.filter((worker) => String(worker.name || "").trim());
+        if (activeSections.length === 0) {
+          return "至少需要 1 個有資料的施工區塊";
+        }
 
-        if (validWorkers.length === 0) {
+        const hasAnyWorker = activeSections.some((section) =>
+          section.workers.some((worker) => String(worker.name || "").trim()),
+        );
+
+        if (!hasAnyWorker) {
           return "至少需要 1 位有效人員";
         }
 
+        return "";
+      }
+
+      function validateWorkers(workers) {
+        const usedNamesBySection = new Map();
+
         for (let i = 0; i < workers.length; i += 1) {
           const worker = workers[i];
-          const rowNo = i + 1;
 
           if (!worker.name) continue;
 
-          if (worker.hours === "" || worker.hours === null || worker.hours === undefined) {
-            return `人員第 ${rowNo} 筆已選姓名，但未填工作時數`;
+          if (
+            worker.hours === "" ||
+            worker.hours === null ||
+            worker.hours === undefined
+          ) {
+            return `人員「${worker.name}」已選姓名，但未填工作時數`;
           }
 
           const hoursNumber = Number(worker.hours);
-
           if (Number.isNaN(hoursNumber) || hoursNumber <= 0) {
             return `人員「${worker.name}」的工作時數必須大於 0`;
           }
-
-          if (usedNames.has(worker.name)) {
-            return `人員「${worker.name}」不可重複選擇`;
-          }
-
-          usedNames.add(worker.name);
         }
 
         return "";
@@ -890,7 +1145,8 @@
           const item = String(expense.item || "").trim();
           const amountRaw = expense.amount;
           const hasItem = item !== "";
-          const hasAmount = amountRaw !== "" && amountRaw !== null && amountRaw !== undefined;
+          const hasAmount =
+            amountRaw !== "" && amountRaw !== null && amountRaw !== undefined;
 
           if (hasItem && !hasAmount) {
             return `支出第 ${rowNo} 筆已填項目，但未填金額`;
@@ -900,9 +1156,7 @@
             return `支出第 ${rowNo} 筆已填金額，但未填項目`;
           }
 
-          if (!hasItem && !hasAmount) {
-            continue;
-          }
+          if (!hasItem && !hasAmount) continue;
 
           const amountNumber = Number(amountRaw);
 
@@ -931,7 +1185,10 @@
           body: JSON.stringify(data),
         })
           .then(() => {
-            setResult("已送出資料。\n請到 Google Sheet 檢查是否新增資料。", "success");
+            setResult(
+              "已送出資料。\n請到 Google Sheet 檢查是否新增資料。",
+              "success",
+            );
             closeLiffWindowIfNeeded();
           })
           .catch((error) => {
@@ -943,9 +1200,7 @@
       }
 
       function closeLiffWindowIfNeeded() {
-        if (typeof liff === "undefined" || !liff.isInClient?.()) {
-          return;
-        }
+        if (typeof liff === "undefined" || !liff.isInClient?.()) return;
 
         setTimeout(() => {
           liff.closeWindow();
@@ -956,7 +1211,9 @@
         state.isSubmitting = isSubmitting;
         dom.submitBtn.disabled = isSubmitting;
         dom.submitBtn.classList.toggle("submit-disabled", isSubmitting);
-        dom.submitBtn.textContent = isSubmitting ? "送出中，請稍候..." : "送出工程日報";
+        dom.submitBtn.textContent = isSubmitting
+          ? "送出中，請稍候..."
+          : "送出工程日報";
       }
 
       function setResult(message, type = "loading") {
