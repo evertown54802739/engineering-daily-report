@@ -371,36 +371,94 @@
         color: var(--danger);
       }
 
-      @media (max-width: 640px) {
-  .worker-row {
-    grid-template-columns: minmax(0, 1.45fr) 64px minmax(0, 1fr) 38px;
-    gap: 6px;
-    align-items: end;
-  }
+     @media (max-width: 640px) {
+        .app-shell {
+          padding-top: 14px;
+        }
 
-  .worker-row .field {
-    min-width: 0;
-  }
+        .app-header {
+          padding: 20px 16px;
+          border-radius: 22px;
+        }
 
-  .worker-row label {
-    font-size: 12px;
-  }
+        .app-title {
+          font-size: 24px;
+        }
 
-  .worker-row input,
-  .worker-row select {
-    min-height: 38px;
-    padding: 7px 8px;
-    font-size: 14px;
-  }
+        .section,
+        .work-block {
+          padding: 16px;
+          border-radius: 18px;
+        }
 
-  .worker-row .remove-btn {
-    width: 36px;
-    min-width: 36px;
-    height: 36px;
-    min-height: 36px;
-    line-height: 36px;
-  }
-}
+        .section-header,
+        .work-block-header {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .field-grid,
+        .block-title-grid,
+        .expense-row {
+          grid-template-columns: 1fr;
+        }
+
+        .worker-row {
+          grid-template-columns: minmax(0, 1.35fr) 58px minmax(0, 0.9fr) 34px;
+          gap: 6px;
+          align-items: end;
+          padding: 8px;
+        }
+
+        .worker-row .field {
+          min-width: 0;
+        }
+
+        .worker-row label {
+          font-size: 11px;
+        }
+
+        .worker-row input,
+        .worker-row select {
+          min-height: 36px;
+          padding: 6px 7px;
+          border-radius: 9px;
+          font-size: 13px;
+        }
+
+        .worker-row .remove-btn {
+          width: 34px;
+          min-width: 34px;
+          height: 34px;
+          min-height: 34px;
+          line-height: 34px;
+          font-size: 17px;
+        }
+
+        .field-full {
+          grid-column: auto;
+        }
+
+        .action-row {
+          flex-direction: column;
+        }
+
+        .block-action-row {
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .block-action-row .btn-secondary,
+        .block-action-row .btn-danger-soft {
+          width: auto;
+        }
+
+        .btn-secondary,
+        .btn-danger-soft {
+          width: 100%;
+        }
+      }
     </style>
   </head>
 
