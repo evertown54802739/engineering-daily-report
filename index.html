@@ -1084,25 +1084,13 @@
 
       function flattenWorkers(workSections) {
         return workSections.flatMap((section) => {
-          const sectionLabel = String(section.projectName || "").trim();
-
           return section.workers
             .filter((worker) => String(worker.name || "").trim())
-            .map((worker) => {
-              const rawNote = String(worker.note || "").trim();
-              const note = [
-                sectionLabel ? `區塊：${sectionLabel}` : "",
-                rawNote,
-              ]
-                .filter(Boolean)
-                .join("；");
-
-              return {
-                name: worker.name,
-                hours: worker.hours,
-                note,
-              };
-            });
+            .map((worker) => ({
+              name: worker.name,
+              hours: worker.hours,
+              note: String(worker.note || "").trim(),
+            }));
         });
       }
 
