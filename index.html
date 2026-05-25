@@ -372,93 +372,113 @@
       }
 
      @media (max-width: 640px) {
-        .app-shell {
-          padding-top: 14px;
-        }
-
-        .app-header {
-          padding: 20px 16px;
-          border-radius: 22px;
-        }
-
-        .app-title {
-          font-size: 24px;
-        }
-
-        .section,
-        .work-block {
-          padding: 16px;
-          border-radius: 18px;
-        }
-
-        .section-header,
-        .work-block-header {
-          flex-direction: column;
-          align-items: stretch;
-        }
-
-        .field-grid,
-        .block-title-grid,
-        .expense-row {
-          grid-template-columns: 1fr;
-        }
-
-        .worker-row {
-          grid-template-columns: minmax(0, 1.35fr) 40px minmax(0, 0.9fr) 30px;
-          gap: 4px;
-          align-items: end;
-          padding: 6px;
-        }
-
-        .worker-row .field {
-          min-width: 0;
-        }
-
-        .worker-row label {
-          font-size: 11px;
-        }
-
-        .worker-row input,
-        .worker-row select {
-          min-height: 36px;
-          padding: 6px 7px;
-          border-radius: 9px;
-          font-size: 13px;
-        }
-
-        .worker-row .remove-btn {
-          width: 34px;
-          min-width: 34px;
-          height: 34px;
-          min-height: 34px;
-          line-height: 34px;
-          font-size: 17px;
-        }
-
-        .field-full {
-          grid-column: auto;
-        }
-
-        .action-row {
-          flex-direction: column;
-        }
-
-        .block-action-row {
-          flex-direction: row;
-          align-items: center;
-          justify-content: space-between;
-        }
-
-        .block-action-row .btn-secondary,
-        .block-action-row .btn-danger-soft {
-          width: auto;
-        }
-
-        .btn-secondary,
-        .btn-danger-soft {
-          width: 100%;
-        }
+      .app-shell {
+        padding-top: 12px;
+        padding-left: 8px;
+        padding-right: 8px;
       }
+
+      .app-header {
+        padding: 18px 14px;
+        border-radius: 20px;
+      }
+
+      .app-title {
+        font-size: 24px;
+      }
+
+      .section {
+        padding: 12px;
+        border-radius: 16px;
+        margin-bottom: 14px;
+      }
+
+      .work-block {
+        padding: 10px;
+        border-radius: 16px;
+        margin-bottom: 12px;
+      }
+
+      .section-header,
+      .work-block-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .field-grid,
+      .block-title-grid,
+      .expense-row {
+        grid-template-columns: 1fr;
+      }
+
+      .block-title-grid {
+        gap: 8px;
+      }
+
+      .workers-list {
+        margin-top: 10px;
+        gap: 8px;
+      }
+
+      .worker-row {
+        grid-template-columns: minmax(0, 1.45fr) 42px minmax(0, 0.9fr) 34px;
+        gap: 5px;
+        align-items: end;
+        padding: 8px;
+        border-radius: 12px;
+      }
+
+      .worker-row .field {
+        min-width: 0;
+        gap: 3px;
+      }
+
+      .worker-row label {
+        font-size: 11px;
+      }
+
+      .worker-row input,
+      .worker-row select {
+        min-height: 34px;
+        padding: 5px 6px;
+        border-radius: 8px;
+        font-size: 13px;
+      }
+
+      .worker-row .remove-btn {
+        width: 34px;
+        min-width: 34px;
+        height: 34px;
+        min-height: 34px;
+        line-height: 34px;
+        font-size: 17px;
+      }
+
+      .field-full {
+        grid-column: auto;
+      }
+
+      .action-row {
+        flex-direction: column;
+        margin-top: 12px;
+      }
+
+      .block-action-row {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .block-action-row .btn-secondary,
+      .block-action-row .btn-danger-soft {
+        width: auto;
+      }
+
+      .btn-secondary,
+      .btn-danger-soft {
+        width: 100%;
+      }
+    }
     </style>
   </head>
 
