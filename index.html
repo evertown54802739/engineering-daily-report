@@ -404,7 +404,7 @@
         }
 
         .worker-row {
-          grid-template-columns: minmax(0, 1.35fr) 58px minmax(0, 0.9fr) 34px;
+          grid-template-columns: minmax(0, 1.45fr) 58px minmax(0, 0.9fr) 34px;
           gap: 6px;
           align-items: end;
           padding: 8px;
@@ -961,7 +961,7 @@
         const select = createElement("select", { className: "worker-name" });
 
         select.appendChild(
-          createElement("option", { value: "", textContent: "請選擇人員" }),
+          createElement("option", { value: "", textContent: "請選擇" }),
         );
 
         state.employeeNames.forEach((name) => {
